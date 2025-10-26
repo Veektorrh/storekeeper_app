@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:inventory_app/models/database_model.dart';
 import 'package:inventory_app/models/item_model.dart';
 import 'package:inventory_app/product_list.dart';
+
 
 void main() async {
   // WidgetsFlutterBinding.ensureInitialized();
@@ -19,7 +21,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       debugShowCheckedModeBanner: false,
 
         home: ProductList()

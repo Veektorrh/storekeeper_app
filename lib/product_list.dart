@@ -3,6 +3,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'models/database_model.dart';
 import 'models/item_model.dart';
+import 'package:get/get.dart';
 
 class ProductList extends StatefulWidget {
   const ProductList({super.key});
@@ -36,7 +37,7 @@ class _ProductListState extends State<ProductList> {
   }
 
   Future<void> _pickImage() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.camera);
+    final pickedFile = await _picker.pickImage(source: ImageSource.camera, preferredCameraDevice: CameraDevice.front);
     if (pickedFile != null) {
       setState(() {
         _imagePath = pickedFile.path;
@@ -140,10 +141,14 @@ class _ProductListState extends State<ProductList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
-      appBar: AppBar(title: const Text('Inventory App')),
+      appBar: AppBar(
+          backgroundColor: Colors.grey.shade900,
+          centerTitle: true,
+          title: const Text('Inventory App', style: TextStyle(color: Colors.white),)),
       body:
       Container(
+        color: Colors.grey.shade800,
+height: Get.height * 0.9,
         child:
 
           // Padding(
@@ -175,22 +180,50 @@ class _ProductListState extends State<ProductList> {
           //     ],
           //   ),
           // ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: items.length,
-              itemBuilder: (_, index) {
-                final item = items[index];
-                return Card(
-                  margin: const EdgeInsets.symmetric(
-                      horizontal: 8, vertical: 4),
+          ListView.builder(
+            itemCount: items.length,
+            itemBuilder: (_, index) {
+              final item = items[index];
+              return Card(
+                margin: const EdgeInsets.symmetric(
+                    horizontal: 8, vertical: 4),
+                child: GestureDetector(
+                  onTap:  (){
+              showDialog(context: context,
+              builder: (_) => AlertDialog(
+              title: Center(child: Text('${item.name}',)),
+              content: SingleChildScrollView(
+              child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+              _imagePath == null
+              ? const Icon(Icons.image, size: 100, color: Colors.grey)
+                  : Image.file(File(_imagePath!), height: 150,
+              width: 150,
+              fit: BoxFit.cover),
+              const SizedBox(height: 10),
+                Text('Quantity: ${item.quantity}'),
+                const SizedBox(height: 10),
+                Text('price: ${item.price}'),
+              ElevatedButton(
+              onPressed: (){ Navigator.pop(context);},
+              child: const Text('Back'),
+              ),
+              ],
+              ),
+              ),
+              ));
+              },
                   child: ListTile(
+                    textColor: Colors.white,
+                    tileColor: Colors.black,
                     leading: item.imagePath != null
                         ? Image.file(File(item.imagePath!), width: 50,
                         height: 50,
                         fit: BoxFit.cover)
                         : const Icon(
                         Icons.image_not_supported, color: Colors.grey),
-                    title: Text('${item.name} (${item.quantity})'),
+                    title: Text('${item.name} (${item.quantity})', style: TextStyle(fontSize: 20),),
                     subtitle: Text('₦${item.price.toStringAsFixed(2)}'),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -204,50 +237,54 @@ class _ProductListState extends State<ProductList> {
                       ],
                     ),
                   ),
-                );
-              },
-            ),
+                ),
+              );
+            },
           ),
 
       ),
-      floatingActionButton: FloatingActionButton(
-          onPressed: (){
-            showDialog(context: context,
-                builder: (_) => AlertDialog(
-                  title: Center(child: Text('Add New Item')),
-                  content: SingleChildScrollView(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                      GestureDetector(
-                              onTap: _pickImage,
-                              child: _imagePath == null
-                                  ? const Icon(Icons.image, size: 80, color: Colors.grey)
-                                  : Image.file(File(_imagePath!), height: 80,
-                                  width: 80,
-                                  fit: BoxFit.cover),
-                            ),
-                            const SizedBox(height: 10),
-                            TextField(controller: _nameController,
-                                decoration: const InputDecoration(labelText: 'Item name')),
-                            TextField(controller: _qtyController,
-                                decoration: const InputDecoration(labelText: 'Quantity'),
-                                keyboardType: TextInputType.number),
-                            TextField(controller: _priceController,
-                                decoration: const InputDecoration(labelText: 'Price'),
-                                keyboardType: TextInputType.number),
-                            const SizedBox(height: 10),
-                            ElevatedButton(
-                              onPressed: _addItem,
-                              child: const Text('Add Item'),
-                            ),
-                      ],
-                    ),
-                  ),
-                ));
-          },
+      floatingActionButton: Container(
+        width: Get.width * 0.33,
+        child: FloatingActionButton(
 
-      child: Text('Add Item'),),
+            onPressed: (){
+              showDialog(context: context,
+                  builder: (_) => AlertDialog(
+                    title: Center(child: Text('Add New Item',)),
+                    content: SingleChildScrollView(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                        GestureDetector(
+                                onTap: _pickImage,
+                                child: _imagePath == null
+                                    ? const Icon(Icons.image, size: 80, color: Colors.grey)
+                                    : Image.file(File(_imagePath!), height: 80,
+                                    width: 80,
+                                    fit: BoxFit.cover),
+                              ),
+                              const SizedBox(height: 10),
+                              TextField(controller: _nameController,
+                                  decoration: const InputDecoration(labelText: 'Item name')),
+                              TextField(controller: _qtyController,
+                                  decoration: const InputDecoration(labelText: 'Quantity'),
+                                  keyboardType: TextInputType.number),
+                              TextField(controller: _priceController,
+                                  decoration: const InputDecoration(labelText: 'Price'),
+                                  keyboardType: TextInputType.number),
+                              const SizedBox(height: 10),
+                              ElevatedButton(
+                                onPressed: _addItem,
+                                child: const Text('Add Item'),
+                              ),
+                        ],
+                      ),
+                    ),
+                  ));
+            },
+
+        child: Text('Add Item'),),
+      ),
     );
   }
 }
