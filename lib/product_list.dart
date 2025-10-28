@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-import 'alertdialogue.dart';
+import 'add_item.dart';
 import 'models/database_model.dart';
 import 'models/item_model.dart';
 import 'package:get/get.dart';
@@ -59,8 +59,6 @@ class _ProductListState extends State<ProductList> {
     _nameController.clear();
     _qtyController.clear();
     _priceController.clear();
-    Navigator.pop(context);
-    _refreshStock();
   }
 
   // Future<void> _addItem() async {
@@ -285,64 +283,65 @@ class _ProductListState extends State<ProductList> {
         child: FloatingActionButton(
 
           onPressed: () {
-            _imagePath = null;
-            _nameController.clear();
-            _qtyController.clear();
-            _priceController.clear();
-            showDialog(
-                context: context,
-                builder: (_) =>
-                // AddItemDialog(onPressed: _addItem,)
-                    AlertDialog(
-                      title: Center(child: Text('Add New Item',)),
-                      content: SingleChildScrollView(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            GestureDetector(
-                              onTap: _pickImage,
-                              child: _imagePath == null
-                                  ? const Icon(
-                                  Icons.camera_alt_rounded, size: 80, color: Colors.grey)
-                                  : Image.file(File(_imagePath!), height: 80,
-                                  width: 80,
-                                  fit: BoxFit.cover),
-                            ),
-                            const SizedBox(height: 10),
-                            TextField(controller: _nameController,
-                                decoration: const InputDecoration(
-                                    labelText: 'Item name')),
-                            TextField(controller: _qtyController,
-                                decoration: const InputDecoration(
-                                    labelText: 'Quantity'),
-                                keyboardType: TextInputType.number),
-                            TextField(controller: _priceController,
-                                decoration: const InputDecoration(
-                                    labelText: 'Price'),
-                                keyboardType: TextInputType.number),
-                            const SizedBox(height: 10),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                TextButton(onPressed: () {
-                                  _nameController.clear();
-                                  _qtyController.clear();
-                                  _priceController.clear();
-                                  _imagePath = null;
-                                  Navigator.pop(context);
-                                }, child: Text('Cancel')),
-                                ElevatedButton(
-                                  onPressed: _addItem,
-                                  child: const Text('Add Item'),
-                                ),
-                              ],
-                            )
-
-                          ],
-                        ),
-                      ),
-                    )
-            );
+            Get.offAll(()=>AddItemDialog());
+            // _imagePath = null;
+            // _nameController.clear();
+            // _qtyController.clear();
+            // _priceController.clear();
+            // showDialog(
+            //     context: context,
+            //     builder: (_) =>
+            //     // AddItemDialog(onPressed: _addItem,)
+            //         AlertDialog(
+            //           title: Center(child: Text('Add New Item',)),
+            //           content: SingleChildScrollView(
+            //             child: Column(
+            //               mainAxisSize: MainAxisSize.min,
+            //               children: [
+            //                 GestureDetector(
+            //                   onTap: _pickImage,
+            //                   child: _imagePath == null
+            //                       ? const Icon(
+            //                       Icons.camera_alt_rounded, size: 80, color: Colors.grey)
+            //                       : Image.file(File(_imagePath!), height: 80,
+            //                       width: 80,
+            //                       fit: BoxFit.cover),
+            //                 ),
+            //                 const SizedBox(height: 10),
+            //                 TextField(controller: _nameController,
+            //                     decoration: const InputDecoration(
+            //                         labelText: 'Item name')),
+            //                 TextField(controller: _qtyController,
+            //                     decoration: const InputDecoration(
+            //                         labelText: 'Quantity'),
+            //                     keyboardType: TextInputType.number),
+            //                 TextField(controller: _priceController,
+            //                     decoration: const InputDecoration(
+            //                         labelText: 'Price'),
+            //                     keyboardType: TextInputType.number),
+            //                 const SizedBox(height: 10),
+            //                 Row(
+            //                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            //                   children: [
+            //                     TextButton(onPressed: () {
+            //                       _nameController.clear();
+            //                       _qtyController.clear();
+            //                       _priceController.clear();
+            //                       _imagePath = null;
+            //                       Navigator.pop(context);
+            //                     }, child: Text('Cancel')),
+            //                     ElevatedButton(
+            //                       onPressed: _addItem,
+            //                       child: const Text('Add Item'),
+            //                     ),
+            //                   ],
+            //                 )
+            //
+            //               ],
+            //             ),
+            //           ),
+            //         )
+            // );
 
           },
 

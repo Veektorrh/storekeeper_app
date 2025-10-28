@@ -4,6 +4,8 @@ import 'package:inventory_app/models/database_model.dart';
 import 'package:inventory_app/models/item_model.dart';
 import 'package:inventory_app/product_list.dart';
 
+import 'add_item.dart';
+
 
 void main() async {
   // WidgetsFlutterBinding.ensureInitialized();
