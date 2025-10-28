@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'alertdialogue.dart';
 import 'models/database_model.dart';
 import 'models/item_model.dart';
 import 'package:get/get.dart';
@@ -21,7 +22,7 @@ class _ProductListState extends State<ProductList> {
   final ImagePicker _picker = ImagePicker();
   String? _imagePath;
 
-  List<Item> items = [];
+   List<Item> items = [];
 
   @override
   void initState() {
@@ -37,7 +38,8 @@ class _ProductListState extends State<ProductList> {
   }
 
   Future<void> _pickImage() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.camera, preferredCameraDevice: CameraDevice.front);
+    final XFile? pickedFile = await _picker.pickImage(
+        source: ImageSource.camera, preferredCameraDevice: CameraDevice.rear);
     if (pickedFile != null) {
       setState(() {
         _imagePath = pickedFile.path;
@@ -46,11 +48,12 @@ class _ProductListState extends State<ProductList> {
   }
 
   Future<void> _addItem() async {
-    final item = Item(
 
-      name: _nameController.text,
-      quantity: int.parse(_qtyController.text),
-      price: double.parse(_priceController.text),
+    final item = Item(
+        name: _nameController.text,
+        quantity: int.parse(_qtyController.text),
+        price: double.parse(_priceController.text),
+        imagePath: _imagePath
     );
     await dbHelper.insertItem(item.toMap());
     _nameController.clear();
@@ -59,6 +62,27 @@ class _ProductListState extends State<ProductList> {
     Navigator.pop(context);
     _refreshStock();
   }
+
+  // Future<void> _addItem() async {
+  //   if (_nameController.text.isEmpty ||
+  //       _qtyController.text.isEmpty ||
+  //       _priceController.text.isEmpty) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //         const SnackBar(content: Text('Please fill all fields')));
+  //     return; }
+  //   final item = Item(
+  //       name: _nameController.text,
+  //       quantity: int.parse(_qtyController.text),
+  //       price: double.parse(_priceController.text),
+  //       imagePath: _imagePath
+  //   );
+  //   await dbHelper.insertItem(item.toMap());
+  //   _nameController.clear();
+  //   _qtyController.clear();
+  //   _priceController.clear();
+  //   Navigator.pop(context);
+  //   // _refreshStock();
+  // }
 
   Future<void> _editItem(Item item) async {
     _nameController.text = item.name;
@@ -78,7 +102,7 @@ class _ProductListState extends State<ProductList> {
                   GestureDetector(
                     onTap: _pickImage,
                     child: _imagePath == null
-                        ? const Icon(Icons.image, size: 80, color: Colors.grey)
+                        ? const Icon(Icons.camera_alt_rounded, size: 80, color: Colors.grey)
                         : Image.file(File(_imagePath!), height: 80,
                         width: 80,
                         fit: BoxFit.cover),
@@ -144,146 +168,185 @@ class _ProductListState extends State<ProductList> {
       appBar: AppBar(
           backgroundColor: Colors.grey.shade900,
           centerTitle: true,
-          title: const Text('Inventory App', style: TextStyle(color: Colors.white),)),
+          title: const Text(
+            'Inventory', style: TextStyle(color: Colors.white),)),
       body:
       Container(
         color: Colors.grey.shade800,
-height: Get.height * 0.9,
+        height: Get.height * 0.9,
         child:
 
-          // Padding(
-          //   padding: const EdgeInsets.all(8),
-          //   child: Column(
-          //     children: [
-          //       GestureDetector(
-          //         onTap: _pickImage,
-          //         child: _imagePath == null
-          //             ? const Icon(Icons.image, size: 80, color: Colors.grey)
-          //             : Image.file(File(_imagePath!), height: 80,
-          //             width: 80,
-          //             fit: BoxFit.cover),
-          //       ),
-          //       const SizedBox(height: 10),
-          //       TextField(controller: _nameController,
-          //           decoration: const InputDecoration(labelText: 'Item name')),
-          //       TextField(controller: _qtyController,
-          //           decoration: const InputDecoration(labelText: 'Quantity'),
-          //           keyboardType: TextInputType.number),
-          //       TextField(controller: _priceController,
-          //           decoration: const InputDecoration(labelText: 'Price'),
-          //           keyboardType: TextInputType.number),
-          //       const SizedBox(height: 10),
-          //       ElevatedButton(
-          //         onPressed: _addItem,
-          //         child: const Text('Add Item'),
-          //       ),
-          //     ],
-          //   ),
-          // ),
-          ListView.builder(
-            itemCount: items.length,
-            itemBuilder: (_, index) {
-              final item = items[index];
-              return Card(
-                margin: const EdgeInsets.symmetric(
-                    horizontal: 8, vertical: 4),
-                child: GestureDetector(
-                  onTap:  (){
-              showDialog(context: context,
-              builder: (_) => AlertDialog(
-              title: Center(child: Text('${item.name}',)),
-              content: SingleChildScrollView(
-              child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-              _imagePath == null
-              ? const Icon(Icons.image, size: 100, color: Colors.grey)
-                  : Image.file(File(_imagePath!), height: 150,
-              width: 150,
-              fit: BoxFit.cover),
-              const SizedBox(height: 10),
-                Text('Quantity: ${item.quantity}'),
-                const SizedBox(height: 10),
-                Text('price: ${item.price}'),
-              ElevatedButton(
-              onPressed: (){ Navigator.pop(context);},
-              child: const Text('Back'),
-              ),
-              ],
-              ),
-              ),
-              ));
-              },
-                  child: ListTile(
-                    textColor: Colors.white,
-                    tileColor: Colors.black,
-                    leading: item.imagePath != null
-                        ? Image.file(File(item.imagePath!), width: 50,
-                        height: 50,
-                        fit: BoxFit.cover)
-                        : const Icon(
-                        Icons.image_not_supported, color: Colors.grey),
-                    title: Text('${item.name} (${item.quantity})', style: TextStyle(fontSize: 20),),
-                    subtitle: Text('₦${item.price.toStringAsFixed(2)}'),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(icon: const Icon(
-                            Icons.edit, color: Colors.blue), onPressed: () =>
-                            _editItem(item)),
-                        IconButton(icon: const Icon(
-                            Icons.delete, color: Colors.red), onPressed: () =>
-                            _deleteItem(item.id!)),
-                      ],
-                    ),
+        // Padding(
+        //   padding: const EdgeInsets.all(8),
+        //   child: Column(
+        //     children: [
+        //       GestureDetector(
+        //         onTap: _pickImage,
+        //         child: _imagePath == null
+        //             ? const Icon(Icons.image, size: 80, color: Colors.grey)
+        //             : Image.file(File(_imagePath!), height: 80,
+        //             width: 80,
+        //             fit: BoxFit.cover),
+        //       ),
+        //       const SizedBox(height: 10),
+        //       TextField(controller: _nameController,
+        //           decoration: const InputDecoration(labelText: 'Item name')),
+        //       TextField(controller: _qtyController,
+        //           decoration: const InputDecoration(labelText: 'Quantity'),
+        //           keyboardType: TextInputType.number),
+        //       TextField(controller: _priceController,
+        //           decoration: const InputDecoration(labelText: 'Price'),
+        //           keyboardType: TextInputType.number),
+        //       const SizedBox(height: 10),
+        //       ElevatedButton(
+        //         onPressed: _addItem,
+        //         child: const Text('Add Item'),
+        //       ),
+        //     ],
+        //   ),
+        // ),
+        ListView.builder(
+          itemCount: items.length,
+          itemBuilder: (_, index) {
+            final item = items[index];
+            return Card(
+              margin: const EdgeInsets.symmetric(
+                  horizontal: 8, vertical: 4),
+              child: GestureDetector(
+                onTap: () {
+                  _nameController.text = item.name;
+                  _qtyController.text = item.quantity.toString();
+                  _priceController.text = item.price.toString();
+                  _imagePath = item.imagePath;
+                  showDialog(context: context,
+                      builder: (_) =>
+                          AlertDialog(
+                            title: Center(child: Text('${item.name}',)),
+                            content: SingleChildScrollView(
+                              child: Column(
+                                // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  _imagePath == null
+                                      ? const Icon(Icons.image, size: 100,
+                                      color: Colors.grey)
+                                      : Image.file(
+                                      File(_imagePath!), height: 150,
+                                      width: 150,
+                                      fit: BoxFit.cover),
+                                  const SizedBox(height: 10),
+                                  Text('Quantity: ${item.quantity}'),
+                                  const SizedBox(height: 10),
+                                  Text('price: ${item.price}'),
+                                  const SizedBox(height: 10),
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: const Text('Back'),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ));
+                },
+                child: ListTile(
+                  textColor: Colors.white,
+                  tileColor: Colors.black,
+                  leading: item.imagePath != null
+                      ? Image.file(File(item.imagePath!), width: 50,
+                      height: 50,
+                      fit: BoxFit.cover)
+                      : const Icon(
+                      Icons.image_not_supported, color: Colors.grey),
+                  title: Text('${item.name} (${item.quantity})',
+                    style: TextStyle(fontSize: 20),),
+                  subtitle: Text('₦${item.price.toStringAsFixed(2)}'),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(icon: const Icon(
+                          Icons.edit, color: Colors.blue), onPressed: () =>
+                          _editItem(item)),
+                      IconButton(icon: const Icon(
+                          Icons.delete, color: Colors.red), onPressed: () =>
+                          _deleteItem(item.id!)),
+                    ],
                   ),
                 ),
-              );
-            },
-          ),
+              ),
+            );
+          },
+        ),
 
       ),
       floatingActionButton: Container(
         width: Get.width * 0.33,
         child: FloatingActionButton(
 
-            onPressed: (){
-              showDialog(context: context,
-                  builder: (_) => AlertDialog(
-                    title: Center(child: Text('Add New Item',)),
-                    content: SingleChildScrollView(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                        GestureDetector(
-                                onTap: _pickImage,
-                                child: _imagePath == null
-                                    ? const Icon(Icons.image, size: 80, color: Colors.grey)
-                                    : Image.file(File(_imagePath!), height: 80,
-                                    width: 80,
-                                    fit: BoxFit.cover),
-                              ),
-                              const SizedBox(height: 10),
-                              TextField(controller: _nameController,
-                                  decoration: const InputDecoration(labelText: 'Item name')),
-                              TextField(controller: _qtyController,
-                                  decoration: const InputDecoration(labelText: 'Quantity'),
-                                  keyboardType: TextInputType.number),
-                              TextField(controller: _priceController,
-                                  decoration: const InputDecoration(labelText: 'Price'),
-                                  keyboardType: TextInputType.number),
-                              const SizedBox(height: 10),
-                              ElevatedButton(
-                                onPressed: _addItem,
-                                child: const Text('Add Item'),
-                              ),
-                        ],
-                      ),
-                    ),
-                  ));
-            },
+          onPressed: () {
+            _imagePath = null;
+            _nameController.clear();
+            _qtyController.clear();
+            _priceController.clear();
+            showDialog(
+                context: context,
+                builder: (_) =>
+                // AddItemDialog(onPressed: _addItem,)
+                    AlertDialog(
+                      title: Center(child: Text('Add New Item',)),
+                      content: SingleChildScrollView(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            GestureDetector(
+                              onTap: _pickImage,
+                              child: _imagePath == null
+                                  ? const Icon(
+                                  Icons.camera_alt_rounded, size: 80, color: Colors.grey)
+                                  : Image.file(File(_imagePath!), height: 80,
+                                  width: 80,
+                                  fit: BoxFit.cover),
+                            ),
+                            const SizedBox(height: 10),
+                            TextField(controller: _nameController,
+                                decoration: const InputDecoration(
+                                    labelText: 'Item name')),
+                            TextField(controller: _qtyController,
+                                decoration: const InputDecoration(
+                                    labelText: 'Quantity'),
+                                keyboardType: TextInputType.number),
+                            TextField(controller: _priceController,
+                                decoration: const InputDecoration(
+                                    labelText: 'Price'),
+                                keyboardType: TextInputType.number),
+                            const SizedBox(height: 10),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                TextButton(onPressed: () {
+                                  _nameController.clear();
+                                  _qtyController.clear();
+                                  _priceController.clear();
+                                  _imagePath = null;
+                                  Navigator.pop(context);
+                                }, child: Text('Cancel')),
+                                ElevatedButton(
+                                  onPressed: _addItem,
+                                  child: const Text('Add Item'),
+                                ),
+                              ],
+                            )
 
-        child: Text('Add Item'),),
+                          ],
+                        ),
+                      ),
+                    )
+            );
+
+          },
+
+          child: Text('Add Item'),),
       ),
     );
   }
