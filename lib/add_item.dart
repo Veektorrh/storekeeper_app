@@ -156,7 +156,7 @@ class _AddItemDialogState extends State<AddItemDialog> {
                   _qtyController.clear();
                   _priceController.clear();
                   _imagePath = null;
-                  Get.back();
+                  Get.to(()=>ProductList());
                 }, child: Text('Cancel')),
                 ElevatedButton(
                   onPressed: (){
