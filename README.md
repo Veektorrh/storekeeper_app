@@ -51,7 +51,7 @@ You can download and test the latest version of the app here 👇
 
 ➡️ Download APK 
 - (Google Drive) https://drive.google.com/file/d/1N_Wi8titj_7JcrQsfhU_jRQlELq49w7C/view?usp=sharing
-- (Appetize) https://appetize.io/app/b_xfphcg7v67affohrkcabjetsum
+- (Appetize) https://appetize.io/app/b_3eubkhfrxhl3zecrwk5moujeqq
 
 ---
 
