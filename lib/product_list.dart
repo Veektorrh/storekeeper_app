@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'add_item.dart';
+import 'edit_item.dart';
 import 'models/database_model.dart';
 import 'models/item_model.dart';
 import 'package:get/get.dart';
@@ -264,8 +265,9 @@ class _ProductListState extends State<ProductList> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(icon: const Icon(
-                          Icons.edit, color: Colors.blue), onPressed: () =>
-                          _editItem(item)),
+                          Icons.edit, color: Colors.blue), 
+                  onPressed: (){Get.to(()=>EditItem(item: items[index]));}),
+                         // () => _editItem(item)),
                       IconButton(icon: const Icon(
                           Icons.delete, color: Colors.red), onPressed: () =>
                           _deleteItem(item.id!)),

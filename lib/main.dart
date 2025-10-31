@@ -5,6 +5,7 @@ import 'package:inventory_app/models/item_model.dart';
 import 'package:inventory_app/product_list.dart';
 
 import 'add_item.dart';
+import 'edit_item.dart';
 
 
 void main() async {
@@ -26,7 +27,7 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
 
-        home: ProductList()
+        home:ProductList()
     );
   }
 }
